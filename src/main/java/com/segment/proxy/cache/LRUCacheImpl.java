@@ -1,6 +1,7 @@
 package com.segment.proxy.cache;
 
-import com.segment.proxy.configs.ProxyConfigs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,6 +12,7 @@ import java.util.List;
  * Created by umehta on 3/2/18.
  */
 public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LRUCacheImpl.class);
     private int capacity;
     private int ttl;
     private LinkedHashMap<K, CacheRecord<V>> cache;
@@ -46,7 +48,7 @@ public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
                 if(cache.size() == capacity){
                     K keyToRemove = cache.entrySet().iterator().next().getKey();
                     cache.remove(keyToRemove);
-                    System.out.println("Removed old key : "+(String)keyToRemove);
+                    LOGGER.debug("Removed key as per LRU : "+ keyToRemove);
                 }
                 cache.put(key, val);
             }
@@ -54,7 +56,7 @@ public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
     }
 
     @Override
-    public int getCapacity() {
+    public int getSize() {
         synchronized (cache){
             return cache.size();
         }
@@ -74,7 +76,7 @@ public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
         }
     }
 
-    private void evictOldEntries() {
+    public void evictOldEntries() {
         long currentTime = System.currentTimeMillis();
         List<K> keysToEvict = new ArrayList<K>();
         synchronized (cache) {
@@ -84,10 +86,11 @@ public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
                 if (currentTime - cache.get(key).getLastAccessed() > ttl)
                     keysToEvict.add(key);
             }
-        }
-        for(K key: keysToEvict){
-            System.out.println("Removed : "+key);
-            cache.remove(key);
+
+            for (K key : keysToEvict) {
+                LOGGER.debug("Evicted key : " + key);
+                cache.remove(key);
+            }
         }
     }
 
@@ -97,7 +100,7 @@ public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
                 while(true) {
                     evictOldEntries();
                     try {
-                        Thread.sleep(ttl);
+                        Thread.sleep(ttl / 2);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -105,7 +108,7 @@ public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
             }
         };
         evicter.start();
-        System.out.println("Started eviction thread : "+ttl);
+        LOGGER.info("Started eviction thread : "+ttl);
     }
 
 }
