@@ -16,7 +16,7 @@ public class ProxyConfigs {
     @Parameter(names = { "-a", "--address" }, description = "Backing Redis address", required = false)
     private String redisUrl = "localhost";
 
-    @Parameter(names = {"-p", "--redis-port" }, description = "Web Server Port", required = false, validateWith = PositiveInteger.class)
+    @Parameter(names = {"-p", "--redis-port" }, description = "Backing Redis Port", required = false, validateWith = PositiveInteger.class)
     private Integer redisPort = 6379;
 
     @Parameter(names = { "-e", "--expiry" }, description = "Cache Expiration Time in Seconds", required = false)
@@ -25,10 +25,13 @@ public class ProxyConfigs {
     @Parameter(names = {"-c", "--capacity"}, description = "Cache Capacity", required = false, validateWith = PositiveInteger.class)
     private Integer capacity = 100;
 
-    @Parameter(names = {"-w", "--web-port" }, description = "Web Server Port", required = false, validateWith = PositiveInteger.class)
+    @Parameter(names = { "-t", "--server-type" }, description = "http/redisAPI", required = false)
+    private String serverType = "http";
+
+    @Parameter(names = {"-w", "--server-port" }, description = "HTTP/RedisAPI Server Port", required = false, validateWith = PositiveInteger.class)
     private Integer port = 8080;
 
-    @Parameter(names = {"-t", "--threads" }, description = "Number of threads to serve requests", required = false, validateWith = PositiveInteger.class)
+    @Parameter(names = {"-n", "--num-threads" }, description = "Number of threads to serve requests", required = false, validateWith = PositiveInteger.class)
     private Integer threads = 20;
 
     @Parameter(names = { "-h", "--help" }, description = "Print help information and exit")
@@ -44,10 +47,9 @@ public class ProxyConfigs {
                 System.exit(0);  //Display usage and exit
             }
         } catch (ParameterException e) {
-        System.err.println(e.getMessage()); //TODO: Replace with logger
-        jc.usage();
-        System.exit(1);
-    }
+            jc.usage();
+            throw  e;
+        }
         return this;
     }
 
@@ -67,7 +69,7 @@ public class ProxyConfigs {
         return capacity;
     }
 
-    public int getWebServerPort() {
+    public int getServerPort() {
         return port;
     }
 
@@ -75,7 +77,9 @@ public class ProxyConfigs {
         return threads;
     }
 
-    public String toString() {
+    public String getServerType() {return serverType; }
+
+    public String configString() {
         return "Redis Address : "+redisUrl +
                 "\nRedis Port : "+redisPort +
                 "\nCache Expiration Time (seconds) : "+expiry +

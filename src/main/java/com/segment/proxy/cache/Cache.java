@@ -9,7 +9,7 @@ public interface Cache<K, V> {
 
     public void set(K key, V val);
 
-    public int getCapacity();
+    public int getSize();
 
     public boolean contains(K key);
 
