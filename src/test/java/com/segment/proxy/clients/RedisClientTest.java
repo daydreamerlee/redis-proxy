@@ -23,7 +23,7 @@ public class RedisClientTest {
 
     @Test
     public void getRedisClient() throws Exception {
-        int port = PortFinder.findFreePort();
+        int port = PortFinder.findRandomOpenPort();
         RedisServer server = new RedisServer(port);
         server.start();
 
@@ -47,7 +47,7 @@ public class RedisClientTest {
 
     @Test
     public void closePool() throws Exception {
-        int port = PortFinder.findFreePort();
+        int port = PortFinder.findRandomOpenPort();
         RedisServer server = new RedisServer(port);
         server.start();
 

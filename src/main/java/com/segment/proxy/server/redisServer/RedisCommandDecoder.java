@@ -1,10 +1,8 @@
-package com.segment.proxy.redisServer;
+package com.segment.proxy.server.redisServer;
 
 import com.segment.proxy.clients.RedisException;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.ReplayingDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,15 +64,6 @@ public class RedisCommandDecoder extends ReplayingDecoder<Void> {
         }
     }
 
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
-            throws Exception {
-
-        LOGGER.info(cause.getLocalizedMessage());
-        //do more exception handling
-        ctx.close();
-    }
-
     private long readLong(ByteBuf is) throws IOException {
         long size = 0;
         int sign = 1;
@@ -99,6 +88,13 @@ public class RedisCommandDecoder extends ReplayingDecoder<Void> {
             read = is.readByte();
         } while (true);
         return size * sign;
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+            throws Exception {
+        LOGGER.error(cause.getLocalizedMessage());
+        ctx.close();
     }
 }
 

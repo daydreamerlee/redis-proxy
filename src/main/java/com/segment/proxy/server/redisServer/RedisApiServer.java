@@ -1,4 +1,4 @@
-package com.segment.proxy.redisServer;
+package com.segment.proxy.server.redisServer;
 
 import com.segment.proxy.cache.Cache;
 import com.segment.proxy.cache.CacheRecord;

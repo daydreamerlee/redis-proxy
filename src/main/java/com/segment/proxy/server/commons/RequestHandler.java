@@ -1,14 +1,12 @@
-package com.segment.proxy.server;
+package com.segment.proxy.server.commons;
 
 import com.segment.proxy.cache.Cache;
 import com.segment.proxy.cache.CacheRecord;
 import com.segment.proxy.clients.RedisClient;
 import com.segment.proxy.clients.RedisException;
-import org.eclipse.jetty.io.ssl.ALPNProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
-import spark.Request;
 
 /**
  * Created by umehta on 3/4/18.
@@ -27,7 +25,7 @@ public class RequestHandler {
         try {
 
             if(req == null){
-                LOGGER.debug("Bad Request. Returning 400");
+                LOGGER.info("Bad Request. Returning 400");
                 resp = new ServerResponse(ServerResponseHelper.BAD_REQUEST_MSG, ServerResponseHelper.BAD_REQUEST_CODE);
                 return resp;
             }
@@ -44,7 +42,7 @@ public class RequestHandler {
             }
 
         } catch (RedisException re) {
-            LOGGER.debug(re.getMessage());
+            LOGGER.error(re.getMessage());
             resp = new ServerResponse(ServerResponseHelper.FAILURE_MSG, ServerResponseHelper.FAILURE_CODE);
         }
         catch (Exception e) {

@@ -1,19 +1,15 @@
-package com.segment.proxy.server;
+package com.segment.proxy.server.http;
 
 import com.segment.proxy.cache.Cache;
-import com.segment.proxy.cache.CacheRecord;
-import com.segment.proxy.clients.RedisClient;
 import com.segment.proxy.configs.ProxyConfigs;
+import com.segment.proxy.server.commons.RequestHandler;
+import com.segment.proxy.server.commons.ServerResponse;
+import com.segment.proxy.server.commons.ServerResponseHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.Jedis;
 import spark.*;
-import spark.Response;
 
-
-import static spark.Spark.get;
-import static spark.Spark.port;
-import static spark.Spark.stop;
+import static spark.Spark.*;
 
 /**
  * Created by umehta on 3/2/18.
@@ -31,6 +27,7 @@ public class HttpServer {
 
     public void startServer() {
         createRoutes();
+        awaitInitialization();
     }
 
     private void createRoutes() { //Easy to add more routes
@@ -42,10 +39,11 @@ public class HttpServer {
             res.status(response.getCode());
             return response.getMsg();
         });
-//        get("/*", (req, res) -> {
-//            res.status(ServerResponseHelper.BAD_REQUEST_CODE);
-//            return ServerResponseHelper.BAD_REQUEST_MSG;
-//        });
+        get("/*", (req, res) -> {
+            LOGGER.error("Invalid request url. Use /proxy to issue request");
+            res.status(ServerResponseHelper.BAD_REQUEST_CODE);
+            return ServerResponseHelper.BAD_REQUEST_MSG;
+        });
     }
 
     private String getKeyFromRequest(Request req) {
@@ -60,5 +58,9 @@ public class HttpServer {
             LOGGER.error("Error retrieving Key from Request : "+e.getMessage());
             return null;
         }
+    }
+
+    public void stopServer() {
+        stop();
     }
 }

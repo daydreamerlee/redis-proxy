@@ -21,6 +21,8 @@ public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
         this.capacity = capacity;
         this.ttl = ttlSecs * 1000;
         cache = new LinkedHashMap<>(capacity);
+        LOGGER.info("Created LRU cache of size : "+capacity+" and TTL : "+ttlSecs);
+
         if(this.ttl > 0)
             startCacheEvicter();
     }
@@ -108,7 +110,7 @@ public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
             }
         };
         evicter.start();
-        LOGGER.info("Started eviction thread : "+ttl);
+        LOGGER.info("Started Cache eviction thread. Will remove entries older than : "+ttl+" milliseconds");
     }
 
 }

@@ -1,14 +1,13 @@
-package com.segment.proxy.redisServer;
+package com.segment.proxy.server.redisServer;
 
 import com.segment.proxy.cache.Cache;
 import com.segment.proxy.cache.CacheRecord;
-import com.segment.proxy.server.RequestHandler;
-import com.segment.proxy.server.ServerResponse;
+import com.segment.proxy.server.commons.RequestHandler;
+import com.segment.proxy.server.commons.ServerResponse;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.Protocol;
 
 /**
  * Created by umehta on 3/4/18.
@@ -39,8 +38,7 @@ public class RedisCommandHandler extends SimpleChannelInboundHandler<byte[][]> {
         RequestHandler handler = new RequestHandler(cache);
         ServerResponse resp = handler.serviceRequest(key);
 
-        System.out.println(command + ":"+ key + " : "+resp.getMsg());
-        ctx.write(resp.getMsg());
+        ctx.write(resp);
     }
 
     @Override
@@ -52,8 +50,8 @@ public class RedisCommandHandler extends SimpleChannelInboundHandler<byte[][]> {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
             throws Exception {
 
-        LOGGER.info(cause.getLocalizedMessage());
+        LOGGER.error(cause.getLocalizedMessage());
         //do more exception handling
-        ctx.close();
+        ctx.write(new ServerResponse("nil", -1));
     }
 }

@@ -1,21 +1,19 @@
-package com.segment.proxy.server;
+package com.segment.proxy.server.common;
 
 import com.segment.proxy.cache.Cache;
 import com.segment.proxy.cache.CacheRecord;
 import com.segment.proxy.cache.LRUCacheImpl;
 import com.segment.proxy.clients.RedisClient;
+import com.segment.proxy.server.commons.RequestHandler;
+import com.segment.proxy.server.commons.ServerResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 import org.mockito.BDDMockito;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import redis.clients.jedis.Jedis;
-import redis.embedded.RedisServer;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;

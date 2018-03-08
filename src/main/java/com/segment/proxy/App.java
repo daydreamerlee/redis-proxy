@@ -6,11 +6,10 @@ import com.segment.proxy.cache.CacheRecord;
 import com.segment.proxy.cache.LRUCacheImpl;
 import com.segment.proxy.clients.RedisClient;
 import com.segment.proxy.configs.ProxyConfigs;
-import com.segment.proxy.redisServer.RedisApiServer;
-import com.segment.proxy.server.HttpServer;
+import com.segment.proxy.server.redisServer.RedisApiServer;
+import com.segment.proxy.server.http.HttpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 
 public class App {

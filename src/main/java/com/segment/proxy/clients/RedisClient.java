@@ -1,6 +1,8 @@
 package com.segment.proxy.clients;
 
 import com.segment.proxy.configs.ProxyConfigs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -9,6 +11,7 @@ import redis.clients.jedis.JedisPoolConfig;
  * Created by umehta on 3/2/18.
  */
 public class RedisClient {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RedisClient.class);
     private static String host;
     private static int port;
     private static int size;
@@ -28,7 +31,7 @@ public class RedisClient {
                 if(pool == null) {
                     JedisPoolConfig config = setPoolConfig();
                     pool = new JedisPool(config, host, port);
-                    System.out.println("Created pool : "+host); //TODO: change to logger
+                    LOGGER.info("Created Redis Connection pool : "+host +":"+port); //TODO: change to logger
                 }
             }
         }
@@ -46,7 +49,7 @@ public class RedisClient {
 
         poolConfig.setBlockWhenExhausted(true);
 
-        //Configure timeouts - Make it configurable
+        //Configure timeouts - Could be configurable
         //Max time to wait to obtain pool resource
         poolConfig.setMaxWaitMillis(60000);
         poolConfig.setMinEvictableIdleTimeMillis(30000);  //Release held resources if idle

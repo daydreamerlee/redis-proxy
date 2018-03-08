@@ -1,4 +1,4 @@
-package com.segment.proxy.server;
+package com.segment.proxy.server.commons;
 
 /**
  * Created by umehta on 3/3/18.
