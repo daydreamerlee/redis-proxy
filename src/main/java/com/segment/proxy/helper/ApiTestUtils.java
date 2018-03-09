@@ -8,9 +8,17 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Created by umehta on 3/5/18.
+ * Helper to issue HTTP requests to test the HTTP Server
  */
 public class ApiTestUtils {
+
+    /**
+     * Issues HTTP request to the server provided in the configs
+     * @param method GET/POST request
+     * @param path the path of the request : Eg /path?key=value
+     * @param connectionURL The server connection URL : Eg localhost:8080
+     * @return
+     */
     public static TestResponse request(String method, String path, String connectionURL) {
         HttpURLConnection connection = null;
         try {

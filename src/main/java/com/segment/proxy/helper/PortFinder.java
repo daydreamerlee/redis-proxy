@@ -6,7 +6,7 @@ import java.net.DatagramSocket;
 import java.net.ServerSocket;
 
 /**
- * From : http://fahdshariff.blogspot.com/2012/10/java-find-available-port-number.html
+ * Helps to find random port on the host. Used for Testing.
  */
 public class PortFinder {
 

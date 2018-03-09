@@ -8,7 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by umehta on 3/4/18.
+ * Writes the message to the output [[ByteBuf]] to respond to the client request.
+ * Output follows the Redis Protocol.
  */
 public class RedisResponseEncoder extends MessageToByteEncoder<ServerResponse> {
     private static Logger LOGGER = LoggerFactory.getLogger(RedisResponseEncoder.class);

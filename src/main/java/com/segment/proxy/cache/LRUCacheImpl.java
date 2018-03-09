@@ -9,7 +9,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
- * Created by umehta on 3/2/18.
+ * LRU Implementation of the [[Cache]] interface. Values in this implementation are stored as [[CacheRecord]] which provides
+ * capability to set ttl for a given entry.
+ * Size of the cache is decided at initialization and LRU entries are evicted cache reaches capacity.
+ * This implementation also starts a eviction thread if the ttl set in the configs is > 0. This thread checks for expired cache entries
+ * and evicts them.
+ * Cache methods are synchronized using the synchronized block. This ensures only 1 thread can access the Cache at a given time.
+ * Cache cannot be made Volatile here instead since the "get", "set" are not atomic operations and involve get-update-set transactions. Volatile will not guarantee thread safety here.
+ * @param <K> The type of the Key
+ * @param <V> The type of the Value. Stored as CacheRecord(V val, long ttl)
  */
 public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(LRUCacheImpl.class);
@@ -17,6 +25,11 @@ public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
     private int ttl;
     private LinkedHashMap<K, CacheRecord<V>> cache;
 
+    /**
+     * Constructor to create Cache. Sets capacity and ttl configs.
+     * @param capacity The max size of the cache after which to start evicting LRU entries
+     * @param ttlSecs The time in seconds after which an entry is evicted.
+     */
     public LRUCacheImpl(int capacity, int ttlSecs) {
         this.capacity = capacity;
         this.ttl = ttlSecs * 1000;
@@ -78,6 +91,9 @@ public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
         }
     }
 
+    /**
+     * Checks for all keys in the cache and evicts all entries older than the set ttl.
+     */
     public void evictOldEntries() {
         long currentTime = System.currentTimeMillis();
         List<K> keysToEvict = new ArrayList<K>();
@@ -96,6 +112,10 @@ public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
         }
     }
 
+
+    /**
+     * Starts a thread to evict expired entries in the Cache ie entries older than ttl seconds.
+     */
     private void startCacheEvicter() {
         Thread evicter = new Thread() {
             public void run() {
