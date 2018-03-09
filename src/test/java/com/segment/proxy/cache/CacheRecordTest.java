@@ -21,6 +21,15 @@ public class CacheRecordTest {
     }
 
     @Test
+    public void getValue1() throws Exception {
+        //Test Cache Record constructor requiring only message and not status
+        String value = "TestVal";
+        CacheRecord<String> record = new CacheRecord<>(value);
+        assertEquals(record.getValue(), value);
+        assertEquals(record.getLastAccessed(), -1);
+    }
+
+    @Test
     public void getLastAccessed() throws Exception {
         String value = "TestVal";
         long lastAccessed = System.currentTimeMillis();

@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Created by umehta on 3/4/18.
+ * Class to decode the request encoded using the Redis Protocol.
  */
 public class RedisCommandDecoder extends ReplayingDecoder<Void> {
     private static Logger LOGGER = LoggerFactory.getLogger(RedisCommandDecoder.class);
@@ -20,6 +20,13 @@ public class RedisCommandDecoder extends ReplayingDecoder<Void> {
     private byte[][] bytes;
     private int arguments = 0;
 
+    /**
+     * Decodes the request received encoded using the Redis protocol.
+     * 1. Initializes an empty byte[][] array to store the request and the arguments. Waits until a '*' byte is received to check for start of msg.
+     * 2. Once a '*' byte is received, it starts parsing the input raising an exception if the expected protocol standard is not followed.
+     * 3. Once it finishes parsing the request, it forwards the 2d byte array to the command handler that will fetch the key from the Cache/Redis.
+     * Adapted technique to decode request from : https://github.com/spullara/redis-protocol
+     */
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception  { // (2)
         if (bytes != null) {
@@ -64,6 +71,12 @@ public class RedisCommandDecoder extends ReplayingDecoder<Void> {
         }
     }
 
+    /**
+     * Reads the number field in the request followed by CRLF. Numbers usually follow * or $ byte in the request to indicate length of array or string.
+     * @param is the [[ByteBuf]] to read from
+     * @return The extracted number.
+     * @throws IOException if there is an invalid character when a number is expected.
+     */
     private long readLong(ByteBuf is) throws IOException {
         long size = 0;
         int sign = 1;

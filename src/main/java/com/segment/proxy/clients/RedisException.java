@@ -1,7 +1,7 @@
 package com.segment.proxy.clients;
 
 /**
- * Created by umehta on 3/4/18.
+ * User defined exception to be thrown when interacting with Redis.
  */
 public class RedisException extends Exception {
 

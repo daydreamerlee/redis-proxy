@@ -8,7 +8,9 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 /**
- * Created by umehta on 3/2/18.
+ * Initializes connection to Redis and set up a Resource pool of clients to reduce connection set up time when serving requests.
+ * The number of these resources are initialized to be the same as the number of threads in the Proxy Server. This way each thread would
+ * get one client and would not have to wait for another thread to complete.
  */
 public class RedisClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisClient.class);
@@ -18,13 +20,21 @@ public class RedisClient {
 
     private static volatile JedisPool pool;
 
+    /**
+     *  Initializes the configs that are used to connect to the Redis Server
+     * @param configs The configs provided to the Proxy
+     */
     public static void intitializeClient(ProxyConfigs configs) {
         host = configs.getRedisUrl();
         port = configs.getRedisPort();
         size = configs.getThreadCount(); //Make Resource pool same as number of threads
     }
 
-    //Lazy threadsafe intialization
+    /**
+     * Return a [[Jedis]] client that is connected to the Redis Server.
+     * Lazy threadsafe intialization of the Redis pool.
+     * @return [[Jedis]] client
+     */
     public static Jedis getRedisClient (){
         if(pool == null){
             synchronized (RedisClient.class) {
@@ -35,10 +45,14 @@ public class RedisClient {
                 }
             }
         }
-        return pool.getResource();
+        return pool.getResource(); //Redis Pool is threadsafe so need not be in the synchronized block
     }
 
 
+    /**
+     * Sets the configs requires for the Jedis pool.
+     * @return [[JedisPoolConfig]] that is used by the [[JedisPool]] to initialize
+     */
     private static JedisPoolConfig setPoolConfig() {
         JedisPoolConfig poolConfig = new JedisPoolConfig();
 
@@ -49,14 +63,17 @@ public class RedisClient {
 
         poolConfig.setBlockWhenExhausted(true);
 
-        //Configure timeouts - Could be configurable
+        //Could be configurable
         //Max time to wait to obtain pool resource
-        poolConfig.setMaxWaitMillis(60000);
-        poolConfig.setMinEvictableIdleTimeMillis(30000);  //Release held resources if idle
+        poolConfig.setMaxWaitMillis(60000); //Wait 60 seconds for client before timing out
+        poolConfig.setMinEvictableIdleTimeMillis(30000);  //Release held resources if idle for 30 seconds
 
         return poolConfig;
     }
 
+    /**
+     * Closes the Resource pool
+     */
     public static void closePool() {
         if(pool != null) {
             synchronized (RedisClient.class) {

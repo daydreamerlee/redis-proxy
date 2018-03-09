@@ -12,7 +12,8 @@ import spark.*;
 import static spark.Spark.*;
 
 /**
- * Created by umehta on 3/2/18.
+ * HTTP Server class that is used to start/stop the HTTP proxy server.
+ * Uses SparkJava framework (http://sparkjava.com/) for setting up the web server with minimal boilerplate code.
  */
 public class HttpServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServer.class);
@@ -20,18 +21,32 @@ public class HttpServer {
     private ProxyConfigs configs;
     private Cache cache;
 
+    /**
+     * Creates new HTTP Server with the configs and the Cache to use
+     * @param configs The [[ProxyConfigs]] provided at command line
+     * @param cache The [[Cache]] implementation
+     */
     public HttpServer(ProxyConfigs configs, Cache cache) {
         this.configs = configs;
         this.cache = cache;
     }
 
+    /**
+     * Starts the HTTP server, creates the routes to service and waits until initialization completes.
+     */
     public void startServer() {
         createRoutes();
         awaitInitialization();
     }
 
+    /**
+     * Creates the routes that will be serviced by the server.
+     * /proxy route is used to issue the GET request for the key: eg valid request - /proxy?key=foo
+     * All other requests not starting with /proxy will be replied with a 400 code
+     */
     private void createRoutes() { //Easy to add more routes
         port(this.configs.getServerPort());
+        threadPool(configs.getThreadCount());
 
         get("/proxy", (req, res) -> {
             RequestHandler handler = new RequestHandler(cache);
@@ -42,10 +57,15 @@ public class HttpServer {
         get("/*", (req, res) -> {
             LOGGER.error("Invalid request url. Use /proxy to issue request");
             res.status(ServerResponseHelper.BAD_REQUEST_CODE);
-            return ServerResponseHelper.BAD_REQUEST_MSG;
+            return ServerResponseHelper.FAILURE_MSG;
         });
     }
 
+    /**
+     * helper to get the key from the request. Requests are of the form: /proxy?key=foo
+     * @param req the Request object to fetch the key from
+     * @return The retrieved key
+     */
     private String getKeyFromRequest(Request req) {
         String key = "";
         try {
@@ -60,6 +80,9 @@ public class HttpServer {
         }
     }
 
+    /**
+     * Stops the server
+     */
     public void stopServer() {
         stop();
     }

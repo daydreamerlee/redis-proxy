@@ -9,8 +9,11 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.segment.proxy.server.commons.ServerResponseHelper.FAILURE_MSG;
+
 /**
- * Created by umehta on 3/4/18.
+ * Handles the decoded message and attempts to fetch it from Cache/Redis if it is a valid request.
+ * Responds 'nil' if that feature is not supported.
  */
 public class RedisCommandHandler extends SimpleChannelInboundHandler<byte[][]> {
     private static Logger LOGGER = LoggerFactory.getLogger(RedisCommandHandler.class);
@@ -21,6 +24,10 @@ public class RedisCommandHandler extends SimpleChannelInboundHandler<byte[][]> {
         this.cache = cache;
     }
 
+    /**
+     * Reads the decoded message from the channel and handles it if it is a valid request and is supported.
+     * Only supports GET key request in the current implementation.
+     */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, byte[][] msg) throws Exception {
         //2d byte array here contains the command and the key to retrieve
@@ -52,6 +59,6 @@ public class RedisCommandHandler extends SimpleChannelInboundHandler<byte[][]> {
 
         LOGGER.error(cause.getLocalizedMessage());
         //do more exception handling
-        ctx.write(new ServerResponse("nil", -1));
+        ctx.write(new ServerResponse(FAILURE_MSG));
     }
 }

@@ -94,7 +94,7 @@ public class RedisAPIServerSystemTest {
         clientIn.read(value1);
         assertEquals(new String(value1), expected1);
 
-        //Test 2 - unsupported request
+        //Test 3 - unsupported request
         String msg2 = "*2\r\n$3\r\nSET\r\n$3\r\ninv\r\n";
         String expected2 = "$-1\r\n";
         clientOut.write(msg2.getBytes());

@@ -10,7 +10,21 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 
 /**
- * Created by umehta on 3/4/18.
+ * Sets up a Redis API server that services clients interfacing through the Redis Protocol
+ * This implementation only supports GET requests.
+ * Uses netty framework to set up the server. Requires more boilerplate code than the HTTP server and it is slightly complex. - https://netty.io/wiki/user-guide-for-4.x.html
+ *
+ *
+ * Eg interaction:
+ * Request from client:
+ * *2\r\n$3\r\nGET\r\n$3\r\nfoo\r\n
+ *
+ * Response:
+ * If found in cache or Redis:
+ * $6\r\nfooval\r\n
+ *
+ * If not found or exception during handling request:
+ * $-1\r\n
  */
 public class RedisApiServer {
     private int port;
@@ -24,34 +38,32 @@ public class RedisApiServer {
     }
 
     public void startServer() throws InterruptedException {
-        EventLoopGroup bossGroup = new NioEventLoopGroup(); // (1)
+        EventLoopGroup bossGroup = new NioEventLoopGroup(); // Use default number of threads to receive requests. Boss Group hands over the request to the workers to handle
         EventLoopGroup workerGroup = new NioEventLoopGroup();
-        DefaultEventExecutorGroup group = new DefaultEventExecutorGroup(this.threads);
+        DefaultEventExecutorGroup group = new DefaultEventExecutorGroup(this.threads); //Set configured thread count to the executor group that would be servicing the requests
 
         try {
-            ServerBootstrap b = new ServerBootstrap(); // (2)
+            ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class) // (3)
-                    .childHandler(new ChannelInitializer<SocketChannel>() { // (4)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        public void initChannel(SocketChannel ch) {
+                        public void initChannel(SocketChannel ch) { //Adds the command decoder, handler and the response encoder to the pipeline.
                             ChannelPipeline p = ch.pipeline();
                             p.addLast(new RedisCommandDecoder());
                             ch.pipeline().addLast(new RedisResponseEncoder());
                             ch.pipeline().addLast(group, new RedisCommandHandler(cache));
                         }
                     })
-                    .option(ChannelOption.SO_BACKLOG, 128)          // (5)
-                    .childOption(ChannelOption.TCP_NODELAY, true) // (6)
+                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .childOption(ChannelOption.TCP_NODELAY, true)
                     .localAddress(port);
 
 
             // Bind and start to accept incoming connections.
-            ChannelFuture f = b.bind().sync(); // (7)
+            ChannelFuture f = b.bind().sync();
 
             // Wait until the server socket is closed.
-            // In this example, this does not happen, but you can do that to gracefully
-            // shut down your server.
             f.channel().closeFuture().sync();
         } finally {
             workerGroup.shutdownGracefully();

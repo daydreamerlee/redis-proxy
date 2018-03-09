@@ -1,17 +1,42 @@
 package com.segment.proxy.cache;
 
 /**
- * Created by umehta on 3/2/18.
+ * Cache interface which classes can implement. Enables implementing multiple types of Caches based on requirements.
+ * Cache stores Kev Value entries.
+ * @param <K> Key stored in the Cache
+ * @param <V> Value stored in the cache
  */
 public interface Cache<K, V> {
 
-    public V get(K key);
+    /**
+     *  Get entry from Cache based on given key
+     * @param key Key to look up
+     * @return Value for the corresponding Key
+     */
+    V get(K key);
 
-    public void set(K key, V val);
+    /**
+     * Sets given Key Value pair in the cache
+     * @param key Key to set
+     * @param val Value to set
+     */
+    void set(K key, V val);
 
-    public int getSize();
+    /**
+     * Get Number of entries in the cache
+     * @return the size of the cache
+     */
+    int getSize();
 
-    public boolean contains(K key);
+    /**
+     * Check if cache contains given key
+     * @param key Key to look up
+     * @return true if cache contains key, false otherwise
+     */
+    boolean contains(K key);
 
-    public void clear();
+    /**
+     * Empties cache
+     */
+    void clear();
 }

@@ -112,7 +112,8 @@ public class ProxyConfigsTest {
                 "Cache Expiration Time (seconds) : 120\n" +
                 "Cache capacity : 100\n" +
                 "Proxy Port : 8080\n" +
-                "Num of Threads : 20";
+                "Num of Threads : 20\n" +
+                "Server Type: http";
         assertEquals("It should return the correct config string", configs.configString(), expectedString);
     }
 
