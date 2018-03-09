@@ -57,7 +57,7 @@ Space:
 1. O(N) - where N is the size of the cache. 
 Requires additional memory to store the pointers for the Doubly Linked List implementation.
 
-## Run the Code
+## Build and Test
 1. Clone the gihub repo and `cd` into the repo:
 ```
 git clone https://github.com/uditmehta27/redis-proxy.git
@@ -75,7 +75,8 @@ make package
 ```
 docker build -t redis-proxy-develop .
 ```
-5. Run the app (All commands are from the project root) :
+## Run application
+All commands are from the project root
 ### Using Docker
 To print usage:
 ```
@@ -86,12 +87,16 @@ To start HTTP Server at port 11500, cache capacity 100, TTL to 2 minutes and pro
 export PORT=11500
 export REDIS_HOST=localhost
 docker run -p $PORT:$PORT redis-proxy-develop -a=$REDIS_HOST -w=$PORT -c=100 -e=120 -n=10
+
+Send HTTP requests : GET /proxy?key=foo
 ```
 To start Redis API Server at port 11500.
 ```
 export PORT=11500
 export REDIS_HOST=localhost
 docker run -p $PORT:$PORT redis-proxy-develop -a=$REDIS_HOST -w=$PORT -t=redisApi
+
+Send request using Redis protocol: *2\r\n$3\r\nGET\r\n$3\r\nfoo\r\n
 ```
 The Project also includes a `docker-compose.yml` file that helps to deploy the app along with a Redis docker container. You can change the command line configs from the `command` key in the file.
 ```
@@ -114,3 +119,5 @@ java -cp target/redis-proxy-1.0-SNAPSHOT-uber.jar com.segment.proxy.App -a=$REDI
 
 ## Unsupported features
 1. All features are supported. The Redis API server could be made more modular and fancy to support more types of requests.
+2. Better testing for Redis API server - possible improvement
+3. Better configuration capability - timeouts for threads and redis client
