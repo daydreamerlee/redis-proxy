@@ -10,46 +10,53 @@
 
     <properties>
         <powermock.version>1.5.6</powermock.version>
+	<jedis.version>2.9.0</jedis.version>
+	<sparkjava.version>2.7.1</sparkjava.version>
+	<jcommander.version>1.48</jcommander.version>
+	<sl4j.version>1.7.13</sl4j.version>
+	<netty.version>4.1.6.Final</netty.version>
+	<junit.version>4.11</junit.version>
+	<mockito.version>1.9.5</mockito.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <version>2.9.0</version>
+            <version>${jedis.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sparkjava</groupId>
             <artifactId>spark-core</artifactId>
-            <version>2.7.1</version>
+            <version>${sparkjava.version}</version>
         </dependency>
         <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
-            <version>1.48</version>
+            <version>${jcommander.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.13</version>
+            <version>${sl4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.13</version>
+            <version>${sl4j.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/io.netty/netty-all -->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>4.1.6.Final</version>
+            <version>${netty.version}</version>
         </dependency>
 
         <!-- Test Framework Dependencies -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -61,7 +68,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
