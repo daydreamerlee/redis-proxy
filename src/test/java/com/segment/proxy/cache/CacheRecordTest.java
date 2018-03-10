@@ -37,4 +37,17 @@ public class CacheRecordTest {
         assertEquals(record.getLastAccessed(), lastAccessed);
     }
 
+    @Test
+    public void setLastAccessed() throws Exception {
+        String value = "TestVal";
+        long lastAccessed = System.currentTimeMillis();
+        long newLastAccessed = System.currentTimeMillis() + 10;
+
+        CacheRecord<String> record = new CacheRecord<>(value, lastAccessed);
+        assertEquals(record.getLastAccessed(), lastAccessed);
+
+        record.setLastAccessed(newLastAccessed);
+        assertEquals(record.getLastAccessed(), newLastAccessed);
+    }
+
 }
