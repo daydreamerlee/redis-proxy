@@ -24,6 +24,7 @@ public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
     private int capacity;
     private int ttl;
     private LinkedHashMap<K, CacheRecord<V>> cache;
+    boolean runEvicter = false;
 
     /**
      * Constructor to create Cache. Sets capacity and ttl configs.
@@ -36,8 +37,10 @@ public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
         cache = new LinkedHashMap<>(capacity);
         LOGGER.info("Created LRU cache of size : "+capacity+" and TTL : "+ttlSecs);
 
-        if(this.ttl > 0)
+        if(this.ttl > 0) {
+            runEvicter = true;
             startCacheEvicter();
+        }
     }
 
     @Override
@@ -45,6 +48,7 @@ public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
         synchronized (cache) {
             if(cache.containsKey(key)) {
                 CacheRecord<V> value = cache.get(key);
+                value.setLastAccessed(System.currentTimeMillis());
                 cache.remove(key);
                 cache.put(key, value);
                 return value;
@@ -88,6 +92,7 @@ public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
     public void clear() {
         synchronized (cache) {
             cache.clear();
+            runEvicter = false;
         }
     }
 
@@ -119,7 +124,7 @@ public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
     private void startCacheEvicter() {
         Thread evicter = new Thread() {
             public void run() {
-                while(true) {
+                while(runEvicter) {
                     evictOldEntries();
                     try {
                         Thread.sleep(ttl / 2);
@@ -129,6 +134,7 @@ public class LRUCacheImpl<K, V> implements Cache<K, CacheRecord<V>> {
                 }
             }
         };
+        //evicter.setDaemon(true);
         evicter.start();
         LOGGER.info("Started Cache eviction thread. Will remove entries older than : "+ttl+" milliseconds");
     }

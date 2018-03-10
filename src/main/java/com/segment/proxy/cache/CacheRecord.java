@@ -41,4 +41,8 @@ public class CacheRecord<V> {
     public long getLastAccessed() {
         return lastAccessed;
     }
+
+    public void setLastAccessed(long lastAccessed) {
+        this.lastAccessed = lastAccessed;
+    }
 }
